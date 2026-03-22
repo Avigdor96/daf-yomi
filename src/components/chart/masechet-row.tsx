@@ -8,14 +8,14 @@ interface MasechetRowProps {
   masechet: Masechet;
   todayDaf: TodaysDaf;
   isLearned: (masechetId: string, daf: number) => boolean;
-  onToggle: (masechetId: string, daf: number) => void;
+  onSelect: (masechetId: string, daf: number) => void;
 }
 
 export const MasechetRow = memo(function MasechetRow({
   masechet,
   todayDaf,
   isLearned,
-  onToggle,
+  onSelect,
 }: MasechetRowProps) {
   const dapim = Array.from({ length: masechet.totalDapim }, (_, i) => masechet.startDaf + i);
   const learnedCount = dapim.filter((daf) => isLearned(masechet.id, daf)).length;
@@ -39,7 +39,7 @@ export const MasechetRow = memo(function MasechetRow({
             daf={daf}
             isLearned={isLearned(masechet.id, daf)}
             isToday={todayDaf.masechetId === masechet.id && todayDaf.daf === daf}
-            onToggle={onToggle}
+            onSelect={onSelect}
           />
         ))}
       </div>
