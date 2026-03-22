@@ -65,7 +65,8 @@ export function getSefariaUrl(masechet: Masechet, daf: number): string {
 }
 
 export function getMDYYouTubeUrl(masechet: Masechet, daf: number): string {
-  // Hebrew videos use Hebrew numerals: "מנחות דף ס״ה" not "מנחות דף 65"
+  // Search all of YouTube in Hebrew with "מרכז דף יומי" prefix
+  // Hebrew numerals give better results: "מנחות סה" not "מנחות 65"
   const hebrewDaf = toHebrewNumeral(daf);
-  return `https://www.youtube.com/@MercazDafYomi/search?query=${encodeURIComponent(`${masechet.nameHe} דף ${hebrewDaf}`)}`;
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(`מרכז דף יומי ${masechet.nameHe} דף ${hebrewDaf}`)}`;
 }

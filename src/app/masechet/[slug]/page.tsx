@@ -4,17 +4,18 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { DafPopup } from "@/components/ui/daf-popup";
 import { Nav } from "@/components/nav";
 import { getMasechetById, toHebrewNumeral, getSefariaUrl, getMDYYouTubeUrl } from "@/lib/daf-yomi";
 import { useProgress } from "@/hooks/use-progress";
-import { ExternalLink, Youtube, BookOpen } from "lucide-react";
+import { Youtube, BookOpen } from "lucide-react";
 
 export default function MasechetPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const masechet = getMasechetById(slug);
   const { isLearned, toggleDaf, getLearnedCount } = useProgress();
   const [showOnlyUnlearned, setShowOnlyUnlearned] = useState(false);
+  const [selectedDaf, setSelectedDaf] = useState<number | null>(null);
 
   if (!masechet) {
     return (
@@ -39,14 +40,14 @@ export default function MasechetPage({ params }: { params: Promise<{ slug: strin
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
             <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-              → חזרה
+              &larr; חזרה
             </Link>
           </div>
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold">מסכת {masechet.nameHe}</h1>
               <p className="text-muted-foreground text-sm mt-1">
-                סדר {masechet.seder} · {masechet.totalDapim} דפים
+                סדר {masechet.seder} &middot; {masechet.totalDapim} דפים
               </p>
             </div>
             <div className="flex gap-1.5 mt-1">
@@ -95,43 +96,17 @@ export default function MasechetPage({ params }: { params: Promise<{ slug: strin
           {filteredDapim.map((daf) => {
             const learned = isLearned(masechet.id, daf);
             return (
-              <Tooltip key={daf}>
-                <TooltipTrigger
-                  onClick={() => toggleDaf(masechet.id, daf)}
-                  className={`aspect-square rounded-md flex flex-col items-center justify-center text-xs sm:text-sm font-medium transition-all hover:scale-105 cursor-pointer group relative ${
-                    learned
-                      ? "bg-learned text-foreground shadow-sm"
-                      : "bg-card border border-border text-muted-foreground hover:border-learned/50"
-                  }`}
-                >
-                  <span className="text-[11px] sm:text-xs">{toHebrewNumeral(daf)}</span>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="flex flex-col items-center gap-1.5 p-2">
-                  <span className="font-medium">{masechet.nameHe} דף {toHebrewNumeral(daf)}</span>
-                  <div className="flex gap-2 text-[11px]">
-                    <a
-                      href={getSefariaUrl(masechet, daf)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-today underline flex items-center gap-0.5"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <BookOpen className="w-3 h-3" />
-                      ספריא
-                    </a>
-                    <a
-                      href={getMDYYouTubeUrl(masechet, daf)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-red-600 underline flex items-center gap-0.5"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Youtube className="w-3 h-3" />
-                      שיעור
-                    </a>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
+              <button
+                key={daf}
+                onClick={() => setSelectedDaf(daf)}
+                className={`aspect-square rounded-md flex flex-col items-center justify-center text-xs sm:text-sm font-medium transition-all hover:scale-105 cursor-pointer ${
+                  learned
+                    ? "bg-learned text-foreground shadow-sm"
+                    : "bg-card border border-border text-muted-foreground hover:border-learned/50"
+                }`}
+              >
+                <span className="text-[11px] sm:text-xs">{toHebrewNumeral(daf)}</span>
+              </button>
             );
           })}
         </div>
@@ -143,6 +118,19 @@ export default function MasechetPage({ params }: { params: Promise<{ slug: strin
           </div>
         )}
       </main>
+
+      {/* Popup for selected daf - works on mobile and desktop */}
+      {selectedDaf !== null && (
+        <DafPopup
+          masechetName={masechet.nameHe}
+          dafLabel={toHebrewNumeral(selectedDaf)}
+          isLearned={isLearned(masechet.id, selectedDaf)}
+          sefariaUrl={getSefariaUrl(masechet, selectedDaf)}
+          youtubeUrl={getMDYYouTubeUrl(masechet, selectedDaf)}
+          onToggle={() => toggleDaf(masechet.id, selectedDaf)}
+          onClose={() => setSelectedDaf(null)}
+        />
+      )}
     </div>
   );
 }
