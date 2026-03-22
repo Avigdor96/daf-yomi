@@ -10,6 +10,7 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "לא מחובר" }, { status: 401 });
   }
+  const userId = session.user.id;
 
   const progress = await db
     .select({
@@ -18,7 +19,7 @@ export async function GET() {
       learnedAt: userProgress.learnedAt,
     })
     .from(userProgress)
-    .where(eq(userProgress.userId, session.user.id));
+    .where(eq(userProgress.userId, userId));
 
   return NextResponse.json(progress);
 }
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "לא מחובר" }, { status: 401 });
   }
+  const userId = session.user.id;
 
   const { masechetId, daf } = await request.json();
 
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
     .from(userProgress)
     .where(
       and(
-        eq(userProgress.userId, session.user.id),
+        eq(userProgress.userId, userId),
         eq(userProgress.masechetId, masechetId),
         eq(userProgress.daf, daf)
       )
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
       .delete(userProgress)
       .where(
         and(
-          eq(userProgress.userId, session.user.id),
+          eq(userProgress.userId, userId),
           eq(userProgress.masechetId, masechetId),
           eq(userProgress.daf, daf)
         )
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
     // Learn
     await db
       .insert(userProgress)
-      .values({ userId: session.user.id, masechetId, daf });
+      .values({ userId, masechetId, daf });
     return NextResponse.json({ action: "added" });
   }
 }

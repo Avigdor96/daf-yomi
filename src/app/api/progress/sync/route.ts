@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "לא מחובר" }, { status: 401 });
   }
+  const userId = session.user.id;
 
   const { items } = (await request.json()) as {
     items: Array<{ masechetId: string; daf: number }>;
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
       daf: userProgress.daf,
     })
     .from(userProgress)
-    .where(eq(userProgress.userId, session.user.id));
+    .where(eq(userProgress.userId, userId));
 
   const existingSet = new Set(
     existing.map((e) => `${e.masechetId}:${e.daf}`)
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
   if (newItems.length > 0) {
     await db.insert(userProgress).values(
       newItems.map((item) => ({
-        userId: session.user.id!,
+        userId: userId!,
         masechetId: item.masechetId,
         daf: item.daf,
       }))
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       daf: userProgress.daf,
     })
     .from(userProgress)
-    .where(eq(userProgress.userId, session.user.id));
+    .where(eq(userProgress.userId, userId));
 
   return NextResponse.json({
     synced: newItems.length,
