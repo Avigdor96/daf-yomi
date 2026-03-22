@@ -7,7 +7,24 @@
       "WebFetch(domain:en.wikipedia.org)",
       "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
       "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack --yes)",
-      "Bash(npx shadcn@latest init -d --yes)"
+      "Bash(npx shadcn@latest init -d --yes)",
+      "Bash(npx shadcn@latest add card progress tooltip --yes)",
+      "Bash(npm run:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(ls \"C:\\\\Users\\\\a0556\\\\Documents\\\\daf-yomi\\\\node_modules\\\\@auth\\\\drizzle-adapter\\\\src\"\" 2>/dev/null || ls \"C:Usersa0556Documentsdaf-yominode_modules@authdrizzle-adapter\"\")",
+      "Bash(npx tsc:*)",
+      "Bash(npx auth:*)",
+      "Bash(node -e \"console.log\\(require\\(''crypto''\\).randomBytes\\(32\\).toString\\(''base64url''\\)\\)\")",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(node -e \"const { Client } = require\\(''pg''\\); const c = new Client\\(''postgresql://postgres:AMNAuEMcy5usvp39@db.facovdrwkpfqfonmtaqd.supabase.co:5432/postgres''\\); c.connect\\(\\).then\\(\\(\\) => { console.log\\(''Connected!''\\); c.end\\(\\); }\\).catch\\(e => console.error\\(''Error:'', e.message\\)\\)\")",
+      "Bash(node -e \"const postgres = require\\(''postgres''\\); const sql = postgres\\(''postgresql://postgres:AMNAuEMcy5usvp39@db.facovdrwkpfqfonmtaqd.supabase.co:5432/postgres''\\); sql\\\\`SELECT 1 as test\\\\`.then\\(r => { console.log\\(''Connected!'', r\\); sql.end\\(\\); }\\).catch\\(e => console.error\\(''Error:'', e.message\\)\\)\")",
+      "Bash(node -e \"const postgres = require\\(''postgres''\\); const sql = postgres\\(''postgresql://postgres:AMNAuEMcy5usvp39@db.facovdrwkpfqfonmtaqd.supabase.co:5432/postgres''\\); sql.unsafe\\(''SELECT 1 as test''\\).then\\(r => { console.log\\(''Connected!'', r\\); sql.end\\(\\); }\\).catch\\(e => { console.error\\(''Error:'', e.message\\); sql.end\\(\\); }\\)\")",
+      "Bash(nslookup db.facovdrwkpfqfonmtaqd.supabase.co)",
+      "Bash(timeout /t 8 /nobreak)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/api/auth/session)",
+      "Bash(netstat -ano)"
     ]
   }
 }
