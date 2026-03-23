@@ -16,6 +16,7 @@ export function DafCell({ masechetName, masechetId, daf, isLearned, isToday, onS
   return (
     <Tooltip>
       <TooltipTrigger
+        onPointerDown={(e) => { e.preventDefault(); onSelect(masechetId, daf); }}
         onClick={() => onSelect(masechetId, daf)}
         aria-label={`${masechetName} דף ${toHebrewNumeral(daf)} - ${isLearned ? "נלמד" : "לא נלמד"}`}
         className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[2px] transition-all duration-150 hover:scale-125 cursor-pointer ${
