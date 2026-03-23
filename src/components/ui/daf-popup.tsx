@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, Youtube, Check, X } from "lucide-react";
 
 interface DafPopupProps {
@@ -22,80 +22,64 @@ export function DafPopup({
   onToggle,
   onClose,
 }: DafPopupProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
+  // Animate in on mount
   useEffect(() => {
-    // Delay attaching the listener so the original touch event
-    // doesn't immediately close the popup
-    const timer = setTimeout(() => {
-      function handleClickOutside(e: MouseEvent | TouchEvent) {
-        if (ref.current && !ref.current.contains(e.target as Node)) {
-          onClose();
-        }
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchstart", handleClickOutside);
+    requestAnimationFrame(() => setVisible(true));
+  }, []);
 
-      // Store for cleanup
-      (ref as React.MutableRefObject<HTMLDivElement | null> & { _cleanup?: () => void })._cleanup = () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("touchstart", handleClickOutside);
-      };
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      const cleanup = (ref as React.MutableRefObject<HTMLDivElement | null> & { _cleanup?: () => void })._cleanup;
-      if (cleanup) cleanup();
-    };
-  }, [onClose]);
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(onClose, 200);
+  };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
-      onClick={(e) => {
-        // Close when clicking the backdrop (not the popup itself)
-        if (e.target === e.currentTarget) onClose();
-      }}
-      onTouchEnd={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      className={`fixed inset-0 z-50 transition-colors duration-200 ${
+        visible ? "bg-black/40" : "bg-transparent"
+      }`}
+      onClick={handleClose}
     >
+      {/* Bottom sheet */}
       <div
-        ref={ref}
-        className="bg-card rounded-xl shadow-xl border border-border p-4 w-[260px] space-y-3 animate-in fade-in zoom-in-95 duration-150"
+        className={`fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl shadow-2xl border-t border-border p-5 pb-8 transition-transform duration-200 ease-out ${
+          visible ? "translate-y-0" : "translate-y-full"
+        }`}
         onClick={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
       >
+        {/* Handle bar */}
+        <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mb-4" />
+
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-lg">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-xl">
             {masechetName} דף {dafLabel}
           </h3>
           <button
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors"
+            onClick={handleClose}
+            className="text-muted-foreground hover:text-foreground p-2 rounded-full hover:bg-muted transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Actions */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {/* Toggle learned */}
           <button
             onClick={() => {
               onToggle();
-              onClose();
+              handleClose();
             }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium transition-colors active:scale-[0.98] ${
               isLearned
-                ? "bg-learned/20 text-foreground hover:bg-learned/30"
-                : "bg-muted hover:bg-muted/80 text-foreground"
+                ? "bg-learned/20 text-foreground"
+                : "bg-muted text-foreground"
             }`}
           >
-            <Check className="w-4 h-4" />
-            {isLearned ? "סמן כלא נלמד" : "סמן כנלמד"}
+            <Check className="w-5 h-5" />
+            {isLearned ? "סמן כלא נלמד" : "סמן כנלמד ✓"}
           </button>
 
           {/* Sefaria link */}
@@ -103,9 +87,9 @@ export function DafPopup({
             href={sefariaUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-today/10 text-today hover:bg-today/20 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium bg-today/10 text-today transition-colors active:scale-[0.98] block"
           >
-            <BookOpen className="w-4 h-4" />
+            <BookOpen className="w-5 h-5" />
             פתח בספריא
           </a>
 
@@ -114,9 +98,9 @@ export function DafPopup({
             href={youtubeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium bg-red-50 text-red-600 transition-colors active:scale-[0.98] block"
           >
-            <Youtube className="w-4 h-4" />
+            <Youtube className="w-5 h-5" />
             שיעור ר&apos; אלי סטפנסקי
           </a>
         </div>
