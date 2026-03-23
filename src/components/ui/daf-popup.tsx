@@ -25,24 +25,47 @@ export function DafPopup({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent | TouchEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onClose();
+    // Delay attaching the listener so the original touch event
+    // doesn't immediately close the popup
+    const timer = setTimeout(() => {
+      function handleClickOutside(e: MouseEvent | TouchEvent) {
+        if (ref.current && !ref.current.contains(e.target as Node)) {
+          onClose();
+        }
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+
+      // Store for cleanup
+      (ref as React.MutableRefObject<HTMLDivElement | null> & { _cleanup?: () => void })._cleanup = () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("touchstart", handleClickOutside);
+      };
+    }, 100);
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
+      clearTimeout(timer);
+      const cleanup = (ref as React.MutableRefObject<HTMLDivElement | null> & { _cleanup?: () => void })._cleanup;
+      if (cleanup) cleanup();
     };
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+      onClick={(e) => {
+        // Close when clicking the backdrop (not the popup itself)
+        if (e.target === e.currentTarget) onClose();
+      }}
+      onTouchEnd={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
         ref={ref}
         className="bg-card rounded-xl shadow-xl border border-border p-4 w-[260px] space-y-3 animate-in fade-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between">
