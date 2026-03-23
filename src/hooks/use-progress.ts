@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 
 const STORAGE_KEY = "hashas-sheli-progress";
-const SYNCED_KEY = "hashas-sheli-synced";
 
 function loadLocalProgress(): Set<string> {
   if (typeof window === "undefined") return new Set();
@@ -39,7 +38,7 @@ export function useProgress() {
     }
   }, []);
 
-  // When authenticated, load progress from server and sync local data
+  // When authenticated, always merge local + server data
   useEffect(() => {
     if (!isAuthenticated || hasSynced.current) return;
     hasSynced.current = true;
@@ -48,10 +47,9 @@ export function useProgress() {
       setIsLoading(true);
       try {
         const localProgress = loadLocalProgress();
-        const alreadySynced = localStorage.getItem(SYNCED_KEY);
 
-        if (localProgress.size > 0 && !alreadySynced) {
-          // First login with existing local data - sync to server
+        if (localProgress.size > 0) {
+          // Has local data - send to server for merge
           const items = [...localProgress].map((key) => {
             const [masechetId, daf] = key.split(":");
             return { masechetId, daf: parseInt(daf, 10) };
@@ -65,18 +63,18 @@ export function useProgress() {
 
           if (res.ok) {
             const data = await res.json();
-            const serverSet = new Set<string>(
+            // Server returns union of local + server data
+            const mergedSet = new Set<string>(
               data.progress.map(
                 (p: { masechetId: string; daf: number }) =>
                   `${p.masechetId}:${p.daf}`
               )
             );
-            setProgress(serverSet);
-            saveLocalProgress(serverSet);
-            localStorage.setItem(SYNCED_KEY, "true");
+            setProgress(mergedSet);
+            saveLocalProgress(mergedSet);
           }
         } else {
-          // Regular load from server
+          // No local data - just load from server
           const res = await fetch("/api/progress");
           if (res.ok) {
             const data = await res.json();
@@ -88,11 +86,10 @@ export function useProgress() {
             );
             setProgress(serverSet);
             saveLocalProgress(serverSet);
-            if (!alreadySynced) localStorage.setItem(SYNCED_KEY, "true");
           }
         }
       } catch (err) {
-        console.error("Failed to sync progress:", err);
+        console.error("[sync]", err);
       } finally {
         setIsLoading(false);
       }
