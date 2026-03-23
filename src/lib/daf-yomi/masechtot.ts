@@ -56,6 +56,14 @@ export function getMasechetById(id: string): Masechet | undefined {
   return MASECHTOT.find((m) => m.id === id);
 }
 
+/** Validate that masechetId exists and daf is within valid range */
+export function isValidDaf(masechetId: string, daf: number): boolean {
+  const masechet = getMasechetById(masechetId);
+  if (!masechet) return false;
+  if (!Number.isInteger(daf)) return false;
+  return daf >= masechet.startDaf && daf < masechet.startDaf + masechet.totalDapim;
+}
+
 export function getMasechtotBySeder(seder: Seder): Masechet[] {
   return MASECHTOT.filter((m) => m.seder === seder);
 }
