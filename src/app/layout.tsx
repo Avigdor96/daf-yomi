@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { SessionProvider } from "@/components/session-provider";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import "./globals.css";
@@ -35,7 +34,7 @@ export default function RootLayout({
     <html lang="he" dir="rtl" className={`${heebo.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         <SessionProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          {children}
           <ServiceWorkerRegister />
         </SessionProvider>
       </body>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { SEDARIM, getMasechtotBySeder, getMasechetById, getTodaysDaf, toHebrewNumeral, getSefariaUrl, getMDYYouTubeUrl } from "@/lib/daf-yomi";
+import { SEDARIM, getMasechtotBySeder, getMasechetById, toHebrewNumeral, getSefariaUrl, getMDYYouTubeUrl } from "@/lib/daf-yomi";
+import { useTodaysDaf } from "@/hooks/use-todays-daf";
 import { SederEnum } from "@/lib/daf-yomi";
 import { MasechetRow } from "./masechet-row";
 import { ProgressSummary } from "./progress-summary";
@@ -10,7 +11,7 @@ import { useProgress } from "@/hooks/use-progress";
 
 export function TalmudChart() {
   const { isLearned, toggleDaf, getLearnedCount } = useProgress();
-  const todayDaf = getTodaysDaf();
+  const todayDaf = useTodaysDaf();
   const learnedCount = getLearnedCount();
   const [selectedDaf, setSelectedDaf] = useState<{ masechetId: string; daf: number } | null>(null);
 

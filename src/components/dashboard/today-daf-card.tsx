@@ -3,12 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getTodaysDaf, getMasechetById, toHebrewNumeral, getSefariaUrl, getMDYYouTubeUrl } from "@/lib/daf-yomi";
+import { getMasechetById, toHebrewNumeral, getSefariaUrl, getMDYYouTubeUrl } from "@/lib/daf-yomi";
 import { useProgress } from "@/hooks/use-progress";
+import { useTodaysDaf } from "@/hooks/use-todays-daf";
 import { Youtube, BookOpen } from "lucide-react";
 
 export function TodayDafCard() {
-  const todayDaf = getTodaysDaf();
+  const todayDaf = useTodaysDaf();
   const masechet = getMasechetById(todayDaf.masechetId)!;
   const { isLearned, toggleDaf } = useProgress();
   const learned = isLearned(todayDaf.masechetId, todayDaf.daf);
